@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 // use Illuminate\Http\Response;
 use Ixudra\Curl\Facades\Curl;
+use App\Weather;
+use App\City;
+use App\weather as AppWeather;
 
 class WeatherController extends Controller
 {
@@ -37,7 +40,43 @@ class WeatherController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $CityId = $request->city_id;
+        $CityData = City::find($CityId);
+        $lon = $CityData->lon;
+        $lat = $CityData->lat;
+        $OpenWeather = Curl::to('http://api.openweathermap.org/data/2.5/onecall')
+            ->withData(['lon' => $lon, 'lat' => $lat, 'appid' => '86b04bc52346e0dd4f59f619ab063349', 'exclude' => 'current,minutely,hourly', 'units' => 'metric'])
+            ->asJsonResponse()
+            ->get();
+        // dd($OpenWeather->daily);
+        $WeatherData = $OpenWeather->daily;
+        $CityName = $CityData->city_name;
+
+        for ($day = 0; $day <= 7; $day++) {
+            $weather = $WeatherData[$day]->weather[0]->description;
+            $sunrise = date('Y-m-d H:i:s', $WeatherData[$day]->sunrise);
+            $sunset = date('Y-m-d H:i:s', $WeatherData[$day]->sunset);
+            $temp = $WeatherData[$day]->temp->day;
+            $temp_min = $WeatherData[$day]->temp->min;
+            $temp_max = $WeatherData[$day]->temp->max;
+            $temp_feel = $WeatherData[$day]->feels_like->day;
+            #create data
+            // Weather::create([
+            //     'city_id' => $CityId, 'weather' => $weather, 'temp' => $temp,
+            //     'temp_feel' => $temp_feel, 'temp_max' => $temp_max, 'temp_min' => $temp_min,
+            //     'sunrise' => $sunrise, 'sunset' => $sunset,
+            //     'day' => $day,
+            // ]);
+
+            #update data
+            Weather::where('city_id', $CityId)->where('day', $day)
+                ->update([
+                    'weather' => $weather, 'temp' => $temp,
+                    'temp_feel' => $temp_feel, 'temp_max' => $temp_max, 'temp_min' => $temp_min,
+                    'sunrise' => $sunrise, 'sunset' => $sunset,
+                ]);
+        }
+        return response()->json(['name' => $CityName, 'weather' => $weather, 'sunrise' => $sunrise, 'temp' => $temp], 200);
     }
 
     /**
@@ -46,21 +85,10 @@ class WeatherController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($city)
+    public function show($CityId)
     {
-        // dd($city);
-        $TainanWeather = Curl::to('http://api.openweathermap.org/data/2.5/weather')
-            ->withData(['q' => $city, 'appid' => '86b04bc52346e0dd4f59f619ab063349', 'units' => 'metric', 'lang' => 'zh_tw'])
-            ->asJsonResponse()
-            ->get();
-        // dd($TainanWeather);
-        $cityname = $TainanWeather->name;
-        $temp = $TainanWeather->main;
-        $FeelLike = $TainanWeather->main->feels_like;
-        $weather = $TainanWeather->weather[0]->description;
-        $UpdateTime = date('Y-m-d H:i:s', 1597809600,);
 
-        return response()->json(['name' => $cityname, 'temp' => $temp, 'feel' => $FeelLike, 'weather' => $weather, 'UpdateTime' => $UpdateTime], 201);
+        return response()->json(['name' => $CityName, 'weather' => $weather, 'sunrise' => $sunrise, 'temp' => $temp], 200);
     }
 
     /**

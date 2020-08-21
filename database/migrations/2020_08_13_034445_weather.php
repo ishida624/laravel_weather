@@ -15,15 +15,17 @@ class Weather extends Migration
     {
         Schema::create('weather', function (Blueprint $table) {
             $table->id();
-            $table->integer('city_id', false, false);
-            $table->char('weather', 10);
-            $table->integer('temper', false, false);
+            // $table->integer('city_id', false, false);
+            $table->unsignedBigInteger('city_id');
+            $table->foreign('city_id')->references('id')->on('city');
+            $table->char('weather', 32);
+            $table->integer('temp', false, false);
             $table->integer('temp_feel', false, false);
             $table->integer('temp_max', false, false);
             $table->integer('temp_min', false, false);
-            $table->date('sunrise');
-            $table->date('sunset');
-            $table->integer('week');
+            $table->dateTime('sunrise');
+            $table->dateTime('sunset');
+            $table->integer('day');
             $table->timestamp('update_time');
         });
     }

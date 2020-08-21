@@ -16,8 +16,8 @@ class City extends Migration
         Schema::create('city', function (Blueprint $table) {
             $table->id();
             $table->char('city_name', 16);
-            $table->float('lon');
-            $table->float('lat');
+            $table->double('lon');
+            $table->double('lat');
         });
     }
 
