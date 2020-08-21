@@ -39,12 +39,20 @@ class OpenWeatherData extends Command
      */
     public function handle()
     {
-        $TainanWeather = Curl::to('http://api.openweathermap.org/data/2.5/weather')
+        $TainanWeather = Curl::to('http://api.openweathermap.org/data/2.5/onecall')
             ->withData(['q' => 'tainan', 'appid' => '86b04bc52346e0dd4f59f619ab063349', 'units' => 'metric', 'lang' => 'zh_tw'])
             ->asJsonResponse()
             ->get();
-        $cityname = $TainanWeather->name;
-        Log::info($cityname);
+        $CityName = $TainanWeather->name;
+        // $Weather = $TainanWeather->weather['description'];
+        $UpdateTime = $TainanWeather->dt;
+        // $Temp = $TainanWeather->main['temp'];
+        // $TempMin = $TainanWeather->main['min'];
+        // $TempMax = $TainanWeather->main['max'];
+        $Sunrise = $TainanWeather->sys->sunrise;
+        $Sunset = $TainanWeather->sys->sunset;
+        $time = date('Y-m-d H:i:s', $UpdateTime);
+        Log::info($time);
         // Log::info($TainanWeather);
         // Log::info("Cron is working fine!");
 

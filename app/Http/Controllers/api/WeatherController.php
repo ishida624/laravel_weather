@@ -49,12 +49,18 @@ class WeatherController extends Controller
     public function show($city)
     {
         // dd($city);
-        $response = Curl::to('http://api.openweathermap.org/data/2.5/weather')
+        $TainanWeather = Curl::to('http://api.openweathermap.org/data/2.5/weather')
             ->withData(['q' => $city, 'appid' => '86b04bc52346e0dd4f59f619ab063349', 'units' => 'metric', 'lang' => 'zh_tw'])
             ->asJsonResponse()
             ->get();
-        dd($response->name);
-        return $response;
+        // dd($TainanWeather);
+        $cityname = $TainanWeather->name;
+        $temp = $TainanWeather->main;
+        $FeelLike = $TainanWeather->main->feels_like;
+        $weather = $TainanWeather->weather[0]->description;
+        $UpdateTime = date('Y-m-d H:i:s', 1597809600,);
+
+        return response()->json(['name' => $cityname, 'temp' => $temp, 'feel' => $FeelLike, 'weather' => $weather, 'UpdateTime' => $UpdateTime], 201);
     }
 
     /**
