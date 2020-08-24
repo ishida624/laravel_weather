@@ -87,8 +87,9 @@ class WeatherController extends Controller
      */
     public function show($CityId)
     {
+        $CityData = City::find($CityId)->weather;
 
-        return response()->json(['name' => $CityName, 'weather' => $weather, 'sunrise' => $sunrise, 'temp' => $temp], 200);
+        return $CityData;
     }
 
     /**

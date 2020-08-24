@@ -15,6 +15,6 @@ class City extends Model
     ];
     public function weather()
     {
-        return $this->hasMany('App\weather');
+        return $this->hasMany('App\Weather');
     }
 }
