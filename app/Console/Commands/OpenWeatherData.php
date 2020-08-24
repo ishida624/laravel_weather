@@ -62,12 +62,19 @@ class OpenWeatherData extends Command
             $temp_feel = $WeatherData[$day]->feels_like->day;
 
             #update data
-            Weather::where('city_id', $CityId)->where('day', $day)
-                ->update([
-                    'weather' => $weather, 'temp' => $temp,
-                    'temp_feel' => $temp_feel, 'temp_max' => $temp_max, 'temp_min' => $temp_min,
-                    'sunrise' => $sunrise, 'sunset' => $sunset,
-                ]);
+            // Weather::where('city_id', $CityId)->where('day', $day)
+            //     ->update([
+            //         'weather' => $weather, 'temp' => $temp,
+            //         'temp_feel' => $temp_feel, 'temp_max' => $temp_max, 'temp_min' => $temp_min,
+            //         'sunrise' => $sunrise, 'sunset' => $sunset,
+            //     ]);
+            #create data
+            Weather::create([
+                'city_id' => $CityId, 'weather' => $weather, 'temp' => $temp,
+                'temp_feel' => $temp_feel, 'temp_max' => $temp_max, 'temp_min' => $temp_min,
+                'sunrise' => $sunrise, 'sunset' => $sunset,
+                'day' => $day,
+            ]);
         }
 
         Log::info(['city_name' => $CityName, 'weather' => $weather]);
